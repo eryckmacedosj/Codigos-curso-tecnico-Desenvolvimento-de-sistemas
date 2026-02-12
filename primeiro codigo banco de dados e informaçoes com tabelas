@@ -1,0 +1,40 @@
+create database empresaDB;
+USE empresaDB;
+
+create TABLE funcionario (
+ID int primary key,
+NOMEFUNC varchar (5),
+ADMISSAO date,
+PLANO varchar (10),
+CIDADE varchar (10),
+CARGOFUNCAO varchar (5)
+
+);
+
+create table dependente (
+
+ID int primary key,
+NOMEDEP varchar(100),
+GRAUPARENTESCO varchar(30),
+IDFUNC int,
+foreign key (IDFUNC)
+references Funcionario (ID)
+);
+
+insert into funcionario values (
+(1, 'CAIO ALEXANDRE', '2022-05-14', 'HAPVIDA', 'SALVADOR', 'EMPRESARIO'),
+(2, 'MATHEUS RAMOS', '2024-02-25', 'SULAMERICA', 'SALVADOR', 'PROGRAMADOR'),
+(3, 'ERICK MACEDO', '2025-02-09', 'PROMEDICA', 'SALVADOR', 'ATLETA')
+
+);
+
+insert into dependentes values (
+
+(1, 'ALAN CESAR', 'PAI', '2'),
+(2, 'FERNANDO TORRES', 'FILHO', '4'),
+(3, 'CRISTIANO MACEDO JR', 'FILHO', '6')
+
+);
+
+insert into funcionario values
+(11, 'CARLOS MELO', '2023-08-21', ' HAPVIDA', 'SALVADOR', 'SUPORTE');
