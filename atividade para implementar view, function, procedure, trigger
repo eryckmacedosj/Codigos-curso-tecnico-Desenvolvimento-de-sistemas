@@ -1,0 +1,83 @@
+create database TechStore;
+use TechStore;
+
+CREATE TABLE Produtos (
+id_produto int primary key auto_increment,
+nome varchar(50),
+preco decimal(10,2),
+estoque int
+);
+
+
+create table Vendas (
+id_venda int primary key auto_increment,
+id_produto int,
+quantidade int,
+data_venda date,
+foreign key (id_produto) references Produtos(id_produto)
+);
+
+CREATE TABLE AvisosEstoque (
+id_aviso int primary key auto_increment,
+id_produto int,
+mensagem varchar(100),
+data_alerta datetime
+);
+
+insert into Produtos (nome, preco, estoque) values
+('pelicula de privacidade', 30.00, 25),
+('teclado ', 200.00, 15),
+('carregador turbo"', 120.00, 19),
+('fone bluetoth', 180.00, 15),
+('capa silicone', 25.00, 30);
+
+
+delimiter //
+create trigger trg_after_insert_venda
+after insert on Vendas
+for each row
+begin
+    update Produtos
+   set estoque = estoque - new.quantidade
+    where id_produto = new.id_produto;
+
+    if (select estoque from Produtos where id_produto = new.id_produto) < 5 then
+        insert into AvisosEstoque (id_produto, mensagem, data_alerta)
+        values (new.id_produto, 'Estoque abaixo de 5', now());
+    end if;
+end //
+DELIMITER ;
+
+DELIMITER //
+create function calcula_total_venda(p_id_venda INT)
+returns decimal(10,2)
+deterministic
+begin
+    declare v_total decimal(10,2);
+
+    select (p.preco * v.quantidade)
+   into v_total
+    from Vendas v
+    join Produtos p ON v.id_produto = p.id_produto
+    where v.id_venda = p_id_venda;
+
+    return v_total;
+end //
+DELIMITER ;
+
+create view vw_relatorio_vendas as
+select
+p.nome as nome_produto,
+v.quantidade,
+v.data_venda,
+(p.preco * v.quantidade) as valor_total
+from Vendas v
+join Produtos p on v.id_produto = p.id_produto;
+
+call registrar_venda(1, 3, '2025-10-08'); 
+
+select * from vw_relatorio_vendas;
+
+select * from Produtos;
+
+select *  from AvisosEstoque;
